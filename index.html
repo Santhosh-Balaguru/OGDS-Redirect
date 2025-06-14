@@ -60,18 +60,25 @@
   <div class="status">Redirecting back to Obsidian</div>
   <footer>If nothing happens, you can now return to Obsidian and close this tab.</footer>
 
-  <script>
-    (function () {
-      const hashParams = new URLSearchParams(location.hash.substring(1));
-      const accessToken = hashParams.get("access_token");
+<script>
+  (function () {
+    const hashParams = new URLSearchParams(location.hash.substring(1));
+    const accessToken = hashParams.get("access_token");
 
-      if (accessToken) {
+    const statusEl = document.querySelector(".status");
+
+    if (accessToken) {
+      statusEl.textContent = "✅ Authentication Successful!";
+      setTimeout(() => {
         const redirectUrl = `obsidian://drive-auth?access_token=${accessToken}`;
         location.href = redirectUrl;
-      } else {
-        document.querySelector(".status").textContent = "Failed to get access token.";
-      }
-    })();
-  </script>
+      }, 800); // short delay so user sees the success
+    } else {
+      statusEl.textContent = "❌ Authentication Failed.";
+      document.querySelector(".logo").style.display = "none";
+    }
+  })();
+</script>
+
 </body>
 </html>
