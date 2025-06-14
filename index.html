@@ -70,7 +70,7 @@
 
     if (accessToken) {
       header.textContent = "Authentication Successful!"
-      statusEl.textContent = "Click the popup to redirect to obsidian..";
+      statusEl.innerHTML = 'Click the <b>Open Obsidian</b> button to redirect to Obsidian…';
       setTimeout(() => {
         const redirectUrl = `obsidian://drive-auth?access_token=${accessToken}`;
         location.href = redirectUrl;
