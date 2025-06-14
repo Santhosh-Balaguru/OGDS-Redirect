@@ -18,29 +18,28 @@
       text-align: center;
     }
 
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+      animation: rotate 4s linear infinite;
+      filter: drop-shadow(0 0 10px #8ab4f8);
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     h1 {
       color: #90caf9;
+      font-size: 1.5rem;
     }
 
     .status {
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       font-size: 1.1rem;
       color: #cfcfcf;
-    }
-
-    .loading {
-      margin-top: 2rem;
-      border: 4px solid #444;
-      border-top: 4px solid #90caf9;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
     }
 
     footer {
@@ -51,13 +50,18 @@
   </style>
 </head>
 <body>
+
+  <!-- Real Obsidian Logo SVG -->
+  <svg class="logo" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#8ab4f8" d="M215.1 18.4c6.8-5.6 16.7-5.6 23.5 0l175.9 143.8c4.4 3.6 6.9 9.1 6.9 14.8v158.1c0 5.7-2.5 11.2-6.9 14.8L238.6 493.6c-6.8 5.6-16.7 5.6-23.5 0L39.2 349.9c-4.4-3.6-6.9-9.1-6.9-14.8V177.1c0-5.7 2.5-11.2 6.9-14.8L215.1 18.4z"/>
+  </svg>
+
   <h1>Authenticating…</h1>
   <div class="status">Redirecting back to Obsidian</div>
-  <div class="loading"></div>
   <footer>If nothing happens, you can now return to Obsidian and close this tab.</footer>
 
   <script>
-    (function() {
+    (function () {
       const hashParams = new URLSearchParams(location.hash.substring(1));
       const accessToken = hashParams.get("access_token");
 
@@ -66,7 +70,6 @@
         location.href = redirectUrl;
       } else {
         document.querySelector(".status").textContent = "Failed to get access token.";
-        document.querySelector(".loading").style.display = "none";
       }
     })();
   </script>
