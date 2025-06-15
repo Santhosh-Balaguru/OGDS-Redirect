@@ -2,105 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Redirecting to Obsidian</title>
-  <style>
-    body {
-      background: #1e1e1e;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-    }
-
-    .logo {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 1rem;
-      animation: rotate 4s linear infinite;
-      filter: drop-shadow(0 0 10px #8ab4f8);
-    }
-
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    h1 {
-      color: #90caf9;
-      font-size: 1.5rem;
-    }
-
-    .status {
-      margin-top: 0.5rem;
-      font-size: 1.1rem;
-      color: #cfcfcf;
-    }
-
-    footer {
-      margin-top: 3rem;
-      font-size: 0.9rem;
-      color: #888;
-    }
-  </style>
+  <title>Auth Redirect</title>
 </head>
 <body>
-  <!-- Real Obsidian Logo SVG -->
-  <svg class="logo" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#8ab4f8" d="M215.1 18.4c6.8-5.6 16.7-5.6 23.5 0l175.9 143.8c4.4 3.6 6.9 9.1 6.9 14.8v158.1c0 5.7-2.5 11.2-6.9 14.8L238.6 493.6c-6.8 5.6-16.7 5.6-23.5 0L39.2 349.9c-4.4-3.6-6.9-9.1-6.9-14.8V177.1c0-5.7 2.5-11.2 6.9-14.8L215.1 18.4z"/>
-  </svg>
-
-  <h1 class="header">Authenticating…</h1>
-  <div class="status">Redirecting back to Obsidian</div>
-  <footer>If nothing happens, you can now return to Obsidian and close this tab.</footer>
-
+  <h2 id="header">Authenticating…</h2>
+  <p id="status">Redirecting back to Obsidian</p>
   <script>
-    (function () {
-      console.log("[Redirect Page] Loaded");
-      
-      // Get URL parameters
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get("code");
-      const state = params.get("state");
-      
-      console.log("[Redirect Page] URL code param:", code);
-      console.log("[Redirect Page] URL state param:", state);
-      
-      const statusEl = document.querySelector(".status");
-      const header = document.querySelector(".header");
-      const logo = document.querySelector(".logo");
+    function getParam(name) {
+      return new URL(location.href).searchParams.get(name);
+    }
 
-if (code) {
-  header.textContent = "Authentication Successful!";
-  statusEl.textContent = "Returning code to Obsidian…";
+    const code = getParam('code');
+    const state = getParam('state');
 
-  try {
-    const channel = new BroadcastChannel("obsidian-auth");
-    channel.postMessage({ code, state });
-    console.log("[Redirect Page] Code sent via BroadcastChannel");
+    console.log('[Redirect Page] Loaded');
+    console.log('[Redirect Page] URL code param:', code);
+    console.log('[Redirect Page] URL state param:', state);
 
-    setTimeout(() => {
-      window.close();
-    }, 1000);
-  } catch (error) {
-    console.error("BroadcastChannel error:", error);
-    statusEl.textContent = "⚠️ Failed to send code to Obsidian.";
-    header.textContent = "Authentication Failed";
-    if (logo) logo.style.display = "none";
-  }
-}
- else {
-        console.warn("[Redirect Page] No code found in URL.");
-        statusEl.textContent = "❌ Authentication Failed.";
-        header.textContent = "Authentication Failed";
-        if (logo) logo.style.display = "none";
+    if (code && state) {
+      document.getElementById('header').textContent = 'Authentication Successful!';
+      document.getElementById('status').textContent = 'Returning code to Obsidian…';
+
+      try {
+        const channel = new BroadcastChannel('obsidian-auth');
+        channel.postMessage({ code, state });
+        console.log('[Redirect Page] Code sent via BroadcastChannel');
+        setTimeout(() => window.close(), 500);
+      } catch (e) {
+        console.error('[Redirect Page] BroadcastChannel failed', e);
+        document.getElementById('header').textContent = 'Error sending code.';
+        document.getElementById('status').textContent = 'Please return to Obsidian and try again.';
       }
-    })();
+    } else {
+      console.error('[Redirect Page] Missing code or state');
+    }
   </script>
 </body>
-</html> 
+</html>
