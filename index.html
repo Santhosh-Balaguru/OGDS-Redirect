@@ -50,7 +50,6 @@
   </style>
 </head>
 <body>
-
   <!-- Real Obsidian Logo SVG -->
   <svg class="logo" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path fill="#8ab4f8" d="M215.1 18.4c6.8-5.6 16.7-5.6 23.5 0l175.9 143.8c4.4 3.6 6.9 9.1 6.9 14.8v158.1c0 5.7-2.5 11.2-6.9 14.8L238.6 493.6c-6.8 5.6-16.7 5.6-23.5 0L39.2 349.9c-4.4-3.6-6.9-9.1-6.9-14.8V177.1c0-5.7 2.5-11.2 6.9-14.8L215.1 18.4z"/>
@@ -60,42 +59,55 @@
   <div class="status">Redirecting back to Obsidian</div>
   <footer>If nothing happens, you can now return to Obsidian and close this tab.</footer>
 
-<script>
-  (function () {
-    console.log("[Redirect Page] Loaded");
+  <script>
+    (function () {
+      console.log("[Redirect Page] Loaded");
+      
+      // Get URL parameters
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+      const state = params.get("state");
+      
+      console.log("[Redirect Page] URL code param:", code);
+      console.log("[Redirect Page] URL state param:", state);
+      
+      const statusEl = document.querySelector(".status");
+      const header = document.querySelector(".header");
+      const logo = document.querySelector(".logo");
 
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    console.log("[Redirect Page] URL code param:", code);
+      if (code) {
+        header.textContent = "Authentication Successful!";
+        statusEl.textContent = "Returning code to Obsidian…";
 
-    const statusEl = document.querySelector(".status");
-    const header = document.querySelector(".header");
-    const pre = document.createElement("pre");
-    pre.textContent = code;
-    document.body.appendChild(pre);
-
-    if (code) {
-      header.textContent = "Authentication Successful!";
-      statusEl.textContent = "Returning code to Obsidian…";
-
-      if (window.opener) {
-        console.log("[Redirect Page] Found opener, sending code...");
-        window.opener.postMessage({ code }, "https://yourdomain.github.io");
-        setTimeout(() => {
-          console.log("[Redirect Page] Closing window...");
-          window.close();
-        }, 1000);
+        if (window.opener) {
+          console.log("[Redirect Page] Found opener, sending code...");
+          try {
+            // Send message to any origin since we're in a popup
+            window.opener.postMessage({ code, state }, "*");
+            console.log("[Redirect Page] Code sent successfully");
+            
+            // Close window after a short delay
+            setTimeout(() => {
+              console.log("[Redirect Page] Closing window...");
+              window.close();
+            }, 1000);
+          } catch (error) {
+            console.error("[Redirect Page] Error sending code:", error);
+            statusEl.textContent = "⚠️ Error sending code to Obsidian.";
+          }
+        } else {
+          console.warn("[Redirect Page] No opener window found.");
+          statusEl.textContent = "⚠️ Could not communicate with Obsidian.";
+          header.textContent = "Authentication Failed";
+          if (logo) logo.style.display = "none";
+        }
       } else {
-        console.warn("[Redirect Page] No opener window found.");
-        statusEl.textContent = "⚠️ Could not communicate with Obsidian.";
+        console.warn("[Redirect Page] No code found in URL.");
+        statusEl.textContent = "❌ Authentication Failed.";
+        header.textContent = "Authentication Failed";
+        if (logo) logo.style.display = "none";
       }
-    } else {
-      console.warn("[Redirect Page] No code found in URL.");
-      statusEl.textContent = "❌ Authentication Failed.";
-      document.querySelector(".logo").style.display = "none";
-    }
-  })();
-</script>
-
+    })();
+  </script>
 </body>
 </html>
