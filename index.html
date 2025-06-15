@@ -70,6 +70,9 @@
 
     const statusEl = document.querySelector(".status");
     const header = document.querySelector(".header");
+    const pre = document.createElement("pre");
+    pre.textContent = code;
+    document.body.appendChild(pre);
 
     if (code) {
       header.textContent = "Authentication Successful!";
@@ -77,7 +80,7 @@
 
       if (window.opener) {
         console.log("[Redirect Page] Found opener, sending code...");
-        window.opener.postMessage({ code }, "*");
+        window.opener.postMessage({ code }, "https://yourdomain.github.io");
         setTimeout(() => {
           console.log("[Redirect Page] Closing window...");
           window.close();
