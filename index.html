@@ -75,36 +75,26 @@
       const header = document.querySelector(".header");
       const logo = document.querySelector(".logo");
 
-      if (code) {
-        header.textContent = "Authentication Successful!";
-        statusEl.textContent = "Returning code to Obsidian…";
+if (code) {
+  header.textContent = "Authentication Successful!";
+  statusEl.textContent = "Returning code to Obsidian…";
 
-        // Try to find the opener window
-        if (window.opener) {
-          console.log("[Redirect Page] Found opener window");
-          try {
-            // Send message to opener window
-            window.opener.postMessage({ code, state }, "*");
-            console.log("[Redirect Page] Code sent successfully");
-            
-            // Close window after a short delay
-            setTimeout(() => {
-              console.log("[Redirect Page] Closing window...");
-              window.close();
-            }, 1000);
-          } catch (error) {
-            console.error("[Redirect Page] Error sending code:", error);
-            statusEl.textContent = "⚠️ Error sending code to Obsidian.";
-            header.textContent = "Authentication Failed";
-            if (logo) logo.style.display = "none";
-          }
-        } else {
-          console.warn("[Redirect Page] No opener window found. This window was not opened as a popup.");
-          statusEl.textContent = "⚠️ Could not communicate with Obsidian. Please try again.";
-          header.textContent = "Authentication Failed";
-          if (logo) logo.style.display = "none";
-        }
-      } else {
+  try {
+    const channel = new BroadcastChannel("obsidian-auth");
+    channel.postMessage({ code, state });
+    console.log("[Redirect Page] Code sent via BroadcastChannel");
+
+    setTimeout(() => {
+      window.close();
+    }, 1000);
+  } catch (error) {
+    console.error("BroadcastChannel error:", error);
+    statusEl.textContent = "⚠️ Failed to send code to Obsidian.";
+    header.textContent = "Authentication Failed";
+    if (logo) logo.style.display = "none";
+  }
+}
+ else {
         console.warn("[Redirect Page] No code found in URL.");
         statusEl.textContent = "❌ Authentication Failed.";
         header.textContent = "Authentication Failed";
