@@ -1,40 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Auth Redirect</title>
+  <title>Google OAuth Redirect</title>
 </head>
 <body>
-  <h2 id="header">Authenticating…</h2>
-  <p id="status">Redirecting back to Obsidian</p>
+  <h3>Processing Authentication...</h3>
   <script>
-    function getParam(name) {
-      return new URL(location.href).searchParams.get(name);
-    }
+    console.log("[Redirect Page] Loaded");
 
-    const code = getParam('code');
-    const state = getParam('state');
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
 
-    console.log('[Redirect Page] Loaded');
-    console.log('[Redirect Page] URL code param:', code);
-    console.log('[Redirect Page] URL state param:', state);
-
-    if (code && state) {
-      document.getElementById('header').textContent = 'Authentication Successful!';
-      document.getElementById('status').textContent = 'Returning code to Obsidian…';
-
-      try {
-        const channel = new BroadcastChannel('obsidian-auth');
-        channel.postMessage({ code, state });
-        console.log('[Redirect Page] Code sent via BroadcastChannel');
-        setTimeout(() => window.close(), 500);
-      } catch (e) {
-        console.error('[Redirect Page] BroadcastChannel failed', e);
-        document.getElementById('header').textContent = 'Error sending code.';
-        document.getElementById('status').textContent = 'Please return to Obsidian and try again.';
-      }
+    if (accessToken) {
+      console.log("[Redirect Page] Access token received:", accessToken);
+      localStorage.setItem('gdrive_token', accessToken);
+      document.body.innerHTML = "<h2>✅ Auth successful! You can return to Obsidian.</h2>";
     } else {
-      console.error('[Redirect Page] Missing code or state');
+      console.warn("[Redirect Page] No access token found");
+      document.body.innerHTML = "<h2>❌ Failed to authenticate with Google. Please try again.</h2>";
     }
   </script>
 </body>
