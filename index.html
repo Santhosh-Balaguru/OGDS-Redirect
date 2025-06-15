@@ -62,8 +62,11 @@
 
 <script>
   (function () {
+    console.log("[Redirect Page] Loaded");
+
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
+    console.log("[Redirect Page] URL code param:", code);
 
     const statusEl = document.querySelector(".status");
     const header = document.querySelector(".header");
@@ -72,20 +75,24 @@
       header.textContent = "Authentication Successful!";
       statusEl.textContent = "Returning code to Obsidian…";
 
-      // Send the code back to the parent window (the plugin)
       if (window.opener) {
-        window.opener.postMessage({ code }, "*"); // you can specify a more secure origin
-        setTimeout(() => window.close(), 1000); // give time for the message to be received
+        console.log("[Redirect Page] Found opener, sending code...");
+        window.opener.postMessage({ code }, "*");
+        setTimeout(() => {
+          console.log("[Redirect Page] Closing window...");
+          window.close();
+        }, 1000);
       } else {
+        console.warn("[Redirect Page] No opener window found.");
         statusEl.textContent = "⚠️ Could not communicate with Obsidian.";
       }
     } else {
+      console.warn("[Redirect Page] No code found in URL.");
       statusEl.textContent = "❌ Authentication Failed.";
       document.querySelector(".logo").style.display = "none";
     }
   })();
 </script>
-
 
 </body>
 </html>
