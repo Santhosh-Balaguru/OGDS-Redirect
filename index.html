@@ -79,10 +79,11 @@
         header.textContent = "Authentication Successful!";
         statusEl.textContent = "Returning code to Obsidian…";
 
+        // Try to find the opener window
         if (window.opener) {
-          console.log("[Redirect Page] Found opener, sending code...");
+          console.log("[Redirect Page] Found opener window");
           try {
-            // Send message to any origin since we're in a popup
+            // Send message to opener window
             window.opener.postMessage({ code, state }, "*");
             console.log("[Redirect Page] Code sent successfully");
             
@@ -94,10 +95,12 @@
           } catch (error) {
             console.error("[Redirect Page] Error sending code:", error);
             statusEl.textContent = "⚠️ Error sending code to Obsidian.";
+            header.textContent = "Authentication Failed";
+            if (logo) logo.style.display = "none";
           }
         } else {
-          console.warn("[Redirect Page] No opener window found.");
-          statusEl.textContent = "⚠️ Could not communicate with Obsidian.";
+          console.warn("[Redirect Page] No opener window found. This window was not opened as a popup.");
+          statusEl.textContent = "⚠️ Could not communicate with Obsidian. Please try again.";
           header.textContent = "Authentication Failed";
           if (logo) logo.style.display = "none";
         }
