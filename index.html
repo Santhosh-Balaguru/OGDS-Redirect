@@ -34,7 +34,30 @@
       word-break: break-all;
       font-size: 0.95rem;
       color: #065f46;
+      margin-bottom: 1rem;
       animation: slideIn 1s ease-in-out;
+    }
+
+    .copy-btn {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .copy-btn:hover {
+      background-color: #2563eb;
+    }
+
+    .copy-status {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: green;
+      display: none;
     }
 
     @keyframes fadeIn {
@@ -64,9 +87,20 @@
 
       document.body.innerHTML = `
         <h2>✅ Authentication Successful</h2>
-        <p class="token-box">${accessToken}</p>
-        <p>You can now copy this token and paste it in Obsidian to complete the connection.</p>
+        <p class="token-box" id="token-box">${accessToken}</p>
+        <button class="copy-btn" onclick="copyToken()">Copy to Clipboard</button>
+        <p class="copy-status" id="copy-status">📋 Token copied!</p>
+        <p>You can now paste this token in Obsidian to complete the connection.</p>
       `;
+
+      window.copyToken = () => {
+        const token = document.getElementById('token-box').textContent;
+        navigator.clipboard.writeText(token).then(() => {
+          const status = document.getElementById('copy-status');
+          status.style.display = "block";
+          setTimeout(() => status.style.display = "none", 2000);
+        });
+      };
     } else {
       document.body.innerHTML = `
         <h2 class="error">❌ Authentication Failed</h2>
