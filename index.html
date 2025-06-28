@@ -1,23 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Google OAuth Redirect</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4ff, #dbeafe);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      color: #1e3a8a;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .token-box {
+      background-color: #e0f2fe;
+      border: 1px solid #90cdf4;
+      border-radius: 10px;
+      padding: 1rem;
+      max-width: 90%;
+      word-break: break-all;
+      font-size: 0.95rem;
+      color: #065f46;
+      animation: slideIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+  </style>
 </head>
 <body>
-  <h3>Processing Authentication...</h3>
-  <script>
-    console.log("[Redirect Page] Loaded");
+  <h2>🔄 Processing authentication...</h2>
 
+  <script>
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = hashParams.get('access_token');
 
     if (accessToken) {
-      console.log("[Redirect Page] Access token received:", accessToken);
       localStorage.setItem('gdrive_token', accessToken);
-      document.body.innerHTML = "<h2>✅ Auth successful! You can return to Obsidian.</h2>";
+
+      document.body.innerHTML = `
+        <h2>✅ Authentication Successful</h2>
+        <p class="token-box">${accessToken}</p>
+        <p>You can now copy this token and paste it in Obsidian to complete the connection.</p>
+      `;
     } else {
-      console.warn("[Redirect Page] No access token found");
-      document.body.innerHTML = "<h2>❌ Failed to authenticate with Google. Please try again.</h2>";
+      document.body.innerHTML = `
+        <h2 class="error">❌ Authentication Failed</h2>
+        <p class="token-box error">No access token received. Please try again.</p>
+      `;
     }
   </script>
 </body>
